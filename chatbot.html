@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pro ChatBot</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: #0d1117;
+      color: #fff;
+    }
+
+    /* Chat Icon and Text together */
+    .chat-button {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      background: #00bfff;
+      padding: 15px;
+      border-radius: 30px;
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      box-shadow: 0 0 20px #00bfff;
+      transition: 0.3s;
+    }
+
+    .chat-button i {
+      font-size: 24px;
+      margin-right: 10px;
+    }
+
+    .chat-button-text {
+      font-size: 16px;
+      color: white;
+      font-weight: bold;
+    }
+
+    .chat-button:hover {
+      transform: scale(1.1);
+    }
+
+    .chat-window {
+  position: fixed;
+  bottom: 100px;
+  right: 30px;
+  width: 340px;
+  height: 500px;
+  background-image: url('https://www.transparenttextures.com/patterns/dots.png');
+  background-size: cover;
+  border-radius: 10px;
+  box-shadow: 0 0 20px rgba(0,0,0,0.7);
+  display: none;
+  flex-direction: column;
+  overflow: hidden;
+
+  /* ✅ Bold outer line */
+  border: 4px solid #00bfff;
+}
+
+
+    .chat-header {
+  background: linear-gradient(135deg, #00bfff, #1e90ff);
+  padding: 14px 20px;
+  text-align: center;
+  font-weight: bold;
+  font-size: 18px;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid #ccc;
+}
+
+    /* Message Box */
+    .chat-box {
+      flex: 1;
+      padding: 15px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      overflow-y: auto;
+      max-height: 300px;
+      background: rgba(0, 0, 0, 0.5);
+      border-radius: 10px;
+    }
+
+    .message {
+      max-width: 80%;
+      padding: 12px 18px;
+      border-radius: 20px;
+      font-size: 16px;
+      line-height: 1.4;
+      margin: 5px 0;
+      position: relative;
+    }
+
+    /* User's message styles */
+    .user {
+      background: linear-gradient(135deg, #6a5acd, #ff6347);
+      align-self: flex-end;
+      color: white;
+    }
+
+    /* Bot's message styles */
+    .bot {
+      background: linear-gradient(135deg, #00bfff, #20b2aa);
+      align-self: flex-start;
+      color: white;
+    }
+
+    /* Avatar */
+    .avatar {
+      font-size: 24px;
+      margin-right: 10px;
+    }
+
+    .message-with-avatar {
+      display: flex;
+      align-items: center;
+    }
+
+    /* Input Area */
+    .chat-input {
+      display: flex;
+      border-top: 1px solid #30363d;
+    }
+
+    .chat-input input {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      outline: none;
+      background: #0d1117;
+      color: #fff;
+    }
+
+    .chat-input button {
+      padding: 0 20px;
+      background: #00bfff;
+      border: none;
+      color: white;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .chat-input button:hover {
+      background: #1da1f2;
+    }
+
+    /* Quick Buttons */
+    #quick-buttons {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-around;
+      padding: 10px;
+      border-top: 1px solid #30363d;
+    }
+
+    .btn {
+      width: 90%;
+      padding: 15px;
+      margin: 5px 0;
+      border: none;
+      background: linear-gradient(145deg, #238636, #2e8b57);
+      color: #fff;
+      border-radius: 12px;
+      font-size: 16px;
+      cursor: pointer;
+      position: relative;
+      box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+      transition: 0.3s ease;
+    }
+
+    .btn:hover {
+      background: linear-gradient(145deg, #2e8b57, #238636);
+      box-shadow: 0 0 25px rgba(255, 255, 255, 0.5);
+    }
+
+    /* Chatbot Button Position */
+    #letsTalkBtn {
+      position: absolute;
+      left: 60px;
+      top: 50%;
+      background: #ff5733;
+      padding: 10px 20px;
+      border-radius: 25px;
+      font-size: 16px;
+      color: #fff;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+    }
+
+    #letsTalkBtn:hover {
+      background: #ff3f1b;
+    }
+
+  </style>
+</head>
+<body>
+
+<!-- Chat Button with Icon and Text -->
+<div class="chat-button" onclick="toggleChat()">
+  <i class="fas fa-robot"></i>
+  <span class="chat-button-text">Let's Talk</span>
+</div>
+
+<!-- Chat Window -->
+<div class="chat-window" id="chatWindow">
+  <div class="chat-header">How may I help you?</div>
+  <div class="chat-box" id="chatBox">
+    <!-- Messages appear here -->
+  </div>
+  <div id="quick-buttons">
+    <button class="btn" onclick="downloadCV()"><i class="fas fa-file-download"></i> Download CV</button>
+    <button class="btn" onclick="hireMe()"><i class="fas fa-briefcase"></i> Hire Me</button>
+  </div>
+  <div class="chat-input">
+    <input type="text" id="userMsg" placeholder="Type your message..." oninput="playTypingSound()"/>
+    <button onclick="sendMessage()">Send</button>
+  </div>
+</div>
+
+<!-- Sound -->
+<audio id="sendSound" src="images/message-send-292621.mp3"></audio>
+<audio id="botSound" src="images/notification-2-269292.mp3"></audio>
+<audio id="typingSound" src=></audio>
+
+<script>
+  function toggleChat() {
+    const chat = document.getElementById('chatWindow');
+    chat.style.display = chat.style.display === "flex" ? "none" : "flex";
+  }
+
+  function appendMessage(msg, type) {
+    const chatBox = document.getElementById('chatBox');
+    const div = document.createElement('div');
+    div.className = 'message ' + type;
+    div.innerHTML = type === 'bot' ? 
+      `<div class="message-with-avatar"><div class="avatar">🤖</div><span>${msg}</span></div>` : 
+      msg;
+    chatBox.appendChild(div);
+    chatBox.scrollTop = chatBox.scrollHeight;
+    document.getElementById(type === 'user' ? 'sendSound' : 'botSound').play();
+  }
+
+  function sendMessage() {
+    const input = document.getElementById('userMsg');
+    const message = input.value.trim();
+    if (!message) return;
+
+    appendMessage(message, 'user');
+    input.value = '';
+
+    setTimeout(() => {
+      appendMessage("How may I help you, sir/mam?", 'bot');
+    }, 500);
+
+    setTimeout(() => {
+      appendMessage("We will reach out to you soon via WhatsApp.", 'bot');
+      sendToWhatsApp(message);
+      document.getElementById('quick-buttons').style.display = 'flex';
+    }, 1500);
+
+    setTimeout(() => {
+      appendMessage("Thanks for your time, sir/mam.", 'bot');
+    }, 2500);
+
+    // Send notifications (Placeholder for integration with real services)
+    sendNotification(message);
+  }
+
+  function playTypingSound() {
+    const typingSound = document.getElementById('typingSound');
+    typingSound.play();
+  }
+
+  function downloadCV() {
+    const allow = confirm("Do you want to download the resume?");
+    if (allow) {
+      window.open("your_resume.pdf", "_blank");
+    }
+  }
+
+  function hireMe() {
+    alert("Thanks for your interest! We'll reach out to you.");
+    window.open("https://wa.me/your-whatsapp-number", "_blank");
+  }
+
+  function sendToWhatsApp(message) {
+    console.log("Sending to WhatsApp:", message);
+  }
+
+  function sendNotification(message) {
+    // Placeholder for SMS or Email integration (using an API like Twilio or SendGrid)
+    console.log("Sending Notification:", message);
+  }
+</script>
+
+</body>
+</html>
